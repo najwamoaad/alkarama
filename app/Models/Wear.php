@@ -22,10 +22,10 @@ class Wear extends Model
     ];
     public function seasone()
     {
-        return $this->BelongsTo(Seasone::class);
+        return $this->belongsTo(Seasone::class);
     }
     public function sport()
     {
-        return $this->BelongsTo(Sport::class);
+        return $this->belongsTo(Sport::class);
     }
 }

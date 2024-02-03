@@ -26,7 +26,7 @@ class association extends Model
         return $this->hasMany(TopFans::class);
     }
 
-    public function sports()
+    public function sport()
     {
         return $this->belongsTo(Sport::class);
     }

@@ -26,10 +26,10 @@ class Standing extends Model
     ];
     public function seasone()
     {
-        return $this->BelongsTo(Seasone::class);
+        return $this->belongsTo(Seasone::class);
     }
     public function clubs()
     {
-        return $this->BelongsTo(Club::class);
+        return $this->belongsTo(Club::class);
     }
 }

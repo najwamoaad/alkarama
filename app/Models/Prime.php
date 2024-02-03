@@ -22,11 +22,11 @@ class Prime extends Model
         'name' => 'string',
         'description' => 'string'
     ];
-    public function sports()
+    public function sport()
     {
         return $this->belongsTo(Sport::class);
     }
-    public function seasones()
+    public function seasone()
     {
         return $this->belongsTo(Seasone::class);
     }

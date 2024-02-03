@@ -20,7 +20,7 @@ class Club extends Model
         'name' => 'string',
         'address' => 'string',
     ];
-    public function sports()
+    public function sport()
     {
         return $this->belongsTo(Sport::class);
     }
@@ -28,5 +28,8 @@ class Club extends Model
     {
         return $this->hasMany(Matche::class);
     }
-
+    public function standings()
+    {
+        return $this->hasMany(Standing::class);
+    }
 }
