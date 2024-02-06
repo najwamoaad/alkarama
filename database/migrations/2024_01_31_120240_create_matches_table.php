@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
             $table->dateTime('datetime');
             $table->string('status');
-            $table->string('plan');
+          
             $table->string('channel');
             $table->tinyInteger('round');
             $table->string('play_ground');

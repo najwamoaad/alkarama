@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer("number");
             $table->date("born");
             $table->string("from");
-            $table->string("first-club");
+            $table->string("first_club");
             $table->string("career");
             $table->string("image");
             $table->unsignedBigInteger("sport_id");

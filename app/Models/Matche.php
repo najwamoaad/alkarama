@@ -12,7 +12,7 @@ class Matche extends Model
     protected $fillable = [
         'datetime',
         'status',
-        'plan',
+     
         'channel',
         "round",
         "playground",
@@ -24,7 +24,7 @@ class Matche extends Model
     protected $casts = [
         'datetime' => "datetime",
         'status' => "string",
-        'plan' => "string",
+        
         'channel' => "string",
         "round" => "tinyinteger",
         "play_ground" => "string",
@@ -70,5 +70,9 @@ class Matche extends Model
    
    
    
+       }
+       public function information(): MorphMany
+       {
+           return $this->morphMany(Information::class, 'infoable');
        }
 }

@@ -17,7 +17,7 @@ class Player extends Model
     protected $casts=
     [
         "uuid"=>"string","name"=>"string","high"=>"integer",
-        "play"=>"string","number"=>"integer","born"=>"date_time",
+        "play"=>"string","number"=>"integer","born"=>"datetime",
         "from"=>"string","first_club"=>"string","career"=>"string",
         "image"=>"string","sport_id"=>"integer"
     ];

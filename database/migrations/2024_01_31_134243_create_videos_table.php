@@ -15,10 +15,12 @@ return new class extends Migration
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->uuid('uuid')->unique();
+            
             $table->morphs('videoable');
             $table->string('url');
             $table->string('description');
+            $table->timestamps();
         });
     }
 

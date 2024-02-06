@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Information extends Model
 {
+    protected $table = 'informations';
     use HasFactory;
     protected $fillable = [
         'title',
