@@ -6,7 +6,7 @@ use App\Http\Traits\FileUploader1;
 use Illuminate\Http\Request;
 use App\Models\Club;
 use App\Http\Resources\ClubResource;
- 
+use App\Http\Resources\ClubCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
  
@@ -77,14 +77,17 @@ class ClubController extends Controller
      */
     public function show(Request $request)
     {
+        $dataa = [];
          try{
-            $Club = Club::with('information')->where('uuid',$request->uuid)->firstOrFail();
+            $Club = Club::where('uuid',$request->uuid)->first();
+           
         if (!$Club) {
             $data['message'] = 'No Club found';
             return $this->apiResponse($data, true, null, 200);
         }
-         
-        $data['Club'] =new ClubResource($Club);
+         $mm = $Club->information()->get();
+      
+        $data['Club'] =ClubResource::collection($mm);
         return $this->apiResponse($data, true, null, 200);
     }
     catch (\Exception $ex) {

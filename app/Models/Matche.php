@@ -53,7 +53,7 @@ class Matche extends Model
     public function statistics() 
     {
 
-        return $this->hasMany(Statistic::class);
+        return $this->hasMany(Statistic::class,"matche_id");
 
 
 

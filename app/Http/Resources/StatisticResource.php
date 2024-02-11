@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ClubResource extends JsonResource
+class StatisticResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -13,14 +13,13 @@ class ClubResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {
-        return [
-           
+    {$v = json_decode($this->value, true);
+        return[
+
+
             'name' => $this->name,
-            'address' => $this->high,
-            'logo' => $this->born,
-            'title'=>  $this->title ,
-         
+            'value' => $v,
+           'match_name'=>$this->metche()->first()->club1()->first()->name
         ];
     }
 }

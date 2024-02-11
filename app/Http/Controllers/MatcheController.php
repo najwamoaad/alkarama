@@ -192,22 +192,7 @@ class MatcheController extends Controller
             $query->where('name',"الكرامة") ;})->where('status', 'life')
             ->where('datetime', '>=', $currentDateTime)->get();
      
-            /*  ->get(['datetime', 'status', 'play_ground', 'club1_id', 'club2_id'])
-            ->map(function ($match) {
-                $datetime = new Date($match->datetime);
-                $match->day = Hijri::date('l', strtotime($datetime));
-                $match->month = date('m/d', strtotime($datetime));
-                $match->time =Hijri::date('h:i a', strtotime($datetime));
-                $match->status = 'life';
-                $club1 = Club::find($match->club1_id);
-                $club2 = Club::find($match->club2_id);
-                $match->club1_name = $club1->name;
-                $match->club2_name = $club2->name;
-                unset($match->club1_id);
-                unset($match->club2_id);
-                unset($match->datetime);
-                return $match;
-            });  */
+          
             
         
             if (!$Matche) {
@@ -215,7 +200,7 @@ class MatcheController extends Controller
                 return $this->apiResponse($data, true, null, 200);
             }
              
-            $data['Matche'] =MatchWithLiveResource::collection($Matche);
+            $data['Matche'] = MatchWithLiveResource::collection($Matche);
             return $this->apiResponse($data, true, null, 200);
         }
         catch (\Exception $ex) {

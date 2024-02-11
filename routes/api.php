@@ -10,7 +10,7 @@ use App\Http\Controllers\MatcheController;
 use App\Http\Controllers\StandingController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\StatisticController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,3 +54,4 @@ Route::get('/standings', [StandingController::class, 'index']);
 Route::post('/standingCreate', [StandingController::class, 'store']);
 
 Route::post('/clubshow', [ClubController::class, 'show']);
+Route::get('/Statistic', [StatisticController::class, 'index']);

@@ -15,11 +15,13 @@ class Statistic extends Model
         'uuid',
         'name',
         'value',
-        'match_id',
+        'matche_id',
     ];
     
     public function metche()
     {
-        return $this->belongsTo(Matche::class);
+        $data = $this->belongsTo(Matche::class,"matche_id","id");
+       
+        return $data;
     }
 }

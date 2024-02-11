@@ -15,11 +15,16 @@ class MatchWithLiveResource extends JsonResource
      */
     public function toArray($request)
     {
+        Carbon::setlocale(config('app.locale'));
+        $dade = Carbon::parse($this->datetime);
         $datetime = $this->datetime;
         $day =   Hijri::date('l', strtotime($datetime));
-        $date = Date('Y/m/d', strtotime($datetime));
+        $date = $dade->toDayDateTimeString() ;
         $time =  Hijri::date('h:i A', strtotime($datetime));
         
+      
+        $statistics = $this->statistics()->first()->value;
+    
         $goals = [];
         $statistics = $this->statistics;
     
@@ -32,11 +37,12 @@ class MatchWithLiveResource extends JsonResource
             $value1 = $values[0];  
             $value2 = $values[1]; 
         }
-    
+      
         return [
             
             
             'date' => $date,
+           'test' => $date->translatedFormat('l j F Y H:i:s'),
             'day' => $day,
             'time' => $time,
           
@@ -46,8 +52,8 @@ class MatchWithLiveResource extends JsonResource
             'club2' => $this->club2->name,
             'club2logo' => $this->club2->logo,
            'status' => 'life',
-           'goalsclub1' =>$value1,
-           'goalsclub2' =>$value2,
+           'goals'=>$value1,
+           'goals2'=>$value2,
         ];
     }
 }
