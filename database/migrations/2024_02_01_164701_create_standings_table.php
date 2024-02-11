@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer("win");
             $table->integer("lose");
             $table->integer("draw");
-            $table->integer("+/-");
+            $table->integer("plus");
             $table->integer("points");
             $table->integer("play");
             $table->unsignedBigInteger("seasone_id");

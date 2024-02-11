@@ -1,30 +1,33 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Traits\GeneralTrait;
-use App\Http\Traits\FileUploader1;
+use App\Http\Resources\StandingResource;
+use App\Models\Standing;
 use Illuminate\Http\Request;
-use App\Models\Club;
-use App\Http\Resources\ClubResource;
- 
+use App\Http\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
- 
-
-class ClubController extends Controller
+class StandingController extends Controller
 {use GeneralTrait;
-    use FileUploader1;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //
+    {try{
+        $standings = Standing::with('club')->get();
+       
+        $data['standings'] = StandingResource::collection($standings);
+
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
-     
+   
 
     /**
      * Store a newly created resource in storage.
@@ -35,9 +38,15 @@ class ClubController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' =>'required|string',
-           'address'=>'required|string',
-           'sport_id'=>'required|string|exists:sports,id',
+            'win' =>'required|integer',
+           'lose'=>'required|integer',
+           'draw'=>'required|integer',
+           'plus'=>'required|integer',
+           'play'=>'required|integer',
+           'seasone_id'=>'required|string|exists:seasones,id',
+           'club_id'=>'required|string|exists:clubs,id',
+          
+
             
         ]);
 
@@ -46,21 +55,23 @@ class ClubController extends Controller
         }
 
         try {
-            if ($request->hasFile('logo')) {
-                $file = $request->file('logo');
-                $folder = 'clubs_images';
-            $Club=Club::create([
+             
+            $Standing=Standing::create([
                 'uuid'=>Str::uuid(),
-                'name'=>$request->name,
-                'address'=>$request->address,
+                'win'=>$request->win,
+                'lose'=>$request->lose,
               
-                'logo'=> $this->storeImage($file, $folder),
-                'sport_id'=>$request->sport_id
+                'draw'=> $request->draw,
+                'plus'=>$request->plus,
+                'play'=>$request->play,
+                'seasone_id'=>$request->seasone_id,
+                'club_id'=>$request->club_id
+                
             ]) ;
         
-            }
+           
          
-            $data['Club'] = new ClubResource($Club);
+            $data['Standing'] = new StandingResource($Standing);
 
             return $this->apiResponse($data, true, null, 200);
         }
@@ -75,21 +86,9 @@ class ClubController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show($id)
     {
-         try{
-            $Club = Club::with('information')->where('uuid',$request->uuid)->firstOrFail();
-        if (!$Club) {
-            $data['message'] = 'No Club found';
-            return $this->apiResponse($data, true, null, 200);
-        }
-         
-        $data['Club'] =new ClubResource($Club);
-        return $this->apiResponse($data, true, null, 200);
-    }
-    catch (\Exception $ex) {
-        return $this->apiResponse(null, false, $ex->getMessage(), 500);
-    }
+        //
     }
 
     /**

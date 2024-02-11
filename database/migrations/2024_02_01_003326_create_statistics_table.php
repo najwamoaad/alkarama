@@ -18,7 +18,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('name');
             $table->json('value');
-            $table->unsignedBigInteger('match_id');
+            $table->unsignedBigInteger('matche_id');
             // Add foreign key constraint
             $table->foreign('match_id')->references('id')->on('matches')->onDelete('cascade');
             $table->timestamps();

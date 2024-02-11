@@ -11,15 +11,15 @@ class Standing extends Model
     use HasFactory;
     protected $fillable=
     [
-        "uuid","win","lose","draw","+/-","points","play","seasone_id","club_id"
+        "uuid","win","lose","draw","plus","play","seasone_id","club_id"
     ];
     protected $casts=
     [
         "uuid"=>"string",
         "win"=>"integer",
         "lose"=>"integer",
-        "+/-"=>"integer",
-        "points"=>"integer",
+        "plus"=>"integer",
+     
         "play"=>"integer",
         "seasone_id"=>"integer",
         "club_id"=>"integer",
@@ -28,7 +28,7 @@ class Standing extends Model
     {
         return $this->belongsTo(Seasone::class);
     }
-    public function clubs()
+    public function club()
     {
         return $this->belongsTo(Club::class);
     }

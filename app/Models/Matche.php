@@ -10,12 +10,13 @@ class Matche extends Model
     use HasFactory;
     protected $table = 'matches';
     protected $fillable = [
+        'uuid',
         'datetime',
         'status',
      
         'channel',
         "round",
-        "playground",
+        "play_ground",
         "session_id",
         "club1_id",
         "club2_id"
@@ -26,13 +27,13 @@ class Matche extends Model
         'status' => "string",
         
         'channel' => "string",
-        "round" => "tinyinteger",
+        
         "play_ground" => "string",
         "session_id" => "integer",
         "club1_id" => "integer",
         "club2_id" => "integer"
     ];
-    public function Seasones() 
+    public function seasone() 
     {
 
         return $this->belongsTo(Seasone::class);
@@ -40,15 +41,16 @@ class Matche extends Model
 
 
     }
-    public function clubs() 
+    public function club1()
     {
-
-        return $this->belongsTo(Club::class);
-
-
-
+        return $this->belongsTo(Club::class, 'club1_id');
     }
-    public function Statistics() 
+
+    public function club2()
+    {
+        return $this->belongsTo(Club::class, 'club2_id');
+    }
+    public function statistics() 
     {
 
         return $this->hasMany(Statistic::class);

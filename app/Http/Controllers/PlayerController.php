@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Http\Resources\PlayerResource;
 use App\Http\Resources\PlayerCollection;
+use App\Http\Resources\PlayerWithInfoResource;
+use App\Http\Resources\PlayerWithInfoCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
 class PlayerController extends Controller
@@ -200,6 +202,22 @@ catch (\Exception $ex) {
     return $this->apiResponse(null, false, $ex->getMessage(), 500);
 } 
 } 
+public function PlayerWithInfo()
+    { try {
+        $player = Player::all();
+      
+        if ($player->isEmpty()) {
+            $data['message'] = 'No player found';
+            return $this->apiResponse($data, true, null, 200);
+        }
+         
+        $data['player']= PlayerWithInfoResource::collection($player);
+        return $this->apiResponse($data, true, null, 200);
+    }
+    catch (\Exception $ex) {
+        return $this->apiResponse(null, false, $ex->getMessage(), 500);
+    }
+    }
 }
 
 

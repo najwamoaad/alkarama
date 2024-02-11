@@ -33,8 +33,8 @@ class Club extends Model
         return $this->hasMany(Standing::class);
     }
      
-    public function information(): MorphMany
+    public function information() 
     {
-        return $this->morphMany(Information::class, 'infoable');
+        return $this->MorphOne(Information::class, 'infoable');
     }
 }

@@ -18,7 +18,7 @@ class Statistic extends Model
         'match_id',
     ];
     
-    public function metch()
+    public function metche()
     {
         return $this->belongsTo(Matche::class);
     }

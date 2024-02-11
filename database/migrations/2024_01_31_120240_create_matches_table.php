@@ -18,8 +18,8 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->timestamps();
             $table->dateTime('datetime');
-            $table->string('status');
-          
+            $table->enum('status', ['not_started', 'finished','life']);
+            enum('status', ['personal', 'club']);
             $table->string('channel');
             $table->tinyInteger('round');
             $table->string('play_ground');
