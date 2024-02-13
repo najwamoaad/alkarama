@@ -14,9 +14,13 @@ use App\Http\Resources\MatchWithLiveResource;
 use App\Http\Resources\MatchWithLiveCollection;
 use App\Http\Resources\UpcomingMatchResource;
 use App\Http\Resources\UpcomingMatchCollection;
+use App\Http\Resources\PlayerWithInfoResource;
+ 
+use App\Http\Resources\MatchWithReplecmentResource;
+ 
 use Carbon\Carbon;
-use Jenssegers\Date\Date;
-use Alkoumi\LaravelHijriDate\Hijri;
+ 
+ 
 use App\Http\Resources\MetcheCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
@@ -124,10 +128,10 @@ class MatcheController extends Controller
     }
     public function showMatcheDatetime(Request $request)
     { try{
-        
-        $datetime=$request->datetime;
+        $currentDateTime = date("Y-m-d H:i:s");
+     //   $datetime=$request->datetime;
         $Matche = Matche::whereHas('club1', function ($query)  {
-            $query->where('name',"الكرامة") ;})->where('datetime',$request->datetime)->where('status',"finished")->first();
+            $query->where('name',"الكرامة") ;})->where('datetime',$request->datetime) ->where('datetime', '<=', $currentDateTime)->where('status',"finished")->first();
         
 
         
@@ -153,15 +157,7 @@ class MatcheController extends Controller
             $query->where('name',"الكرامة") ;})->where('status','not_started')
             ->where('datetime', '>=', Carbon::now())
             ->orderBy('datetime', 'asc')->get();
-            /* ->get(['datetime', 'status', 'play_ground', 'club1_id', 'club2_id'])
-            ->map(function ($match) {
-                $datetime = new Date($match->datetime);
-                $match->day = Hijri::date('l', strtotime($datetime));
-                $match->month = date('m/d', strtotime($datetime));
-                $match->time =Hijri::date('h:i a', strtotime($datetime));
-                unset($match->datetime);
-                return $match;
-            }); */
+        
             
         
             if ($Matche->isEmpty()) {
@@ -183,14 +179,14 @@ class MatcheController extends Controller
     { try{
         
        
-        $currentDateTime = Carbon::now();
+        $currentDateTime = date("Y-m-d H:i:s");
         
-       
-   //     $threeHoursAgo = $currentDateTime->subHours(3);
-        $threeHoursLater = $currentDateTime->addHours(3);
+        
+  
         $Matche = Matche::whereHas('club1', function ($query)  {
             $query->where('name',"الكرامة") ;})->where('status', 'life')
-            ->where('datetime', '>=', $currentDateTime)->get();
+        ->    where('datetime', '>=', $currentDateTime)
+            ->where('datetime', '<=', date('Y-m-d H:i:s', strtotime($currentDateTime. ' + 3 hours')))->get();
      
           
             
@@ -212,46 +208,17 @@ class MatcheController extends Controller
     { try{
         
        
-        $currentDateTime = Carbon::now();
-        $threeHoursAgo = $currentDateTime->addHours(3);
+      
         
-      //  $threeHoursLater = $currentDateTime->addHours(3);
-       
+        $currentDateTime = date('Y-m-d H:i:s');
+    $end_time = date('Y-m-d H:i:s', strtotime('+3 hours', strtotime($currentDateTime)));
+  
         $Matche = Matche::whereHas('club1', function ($query)  {
             $query->where('name',"الكرامة") ;})->where('status', 'life')
-            ->where('datetime', '>=', $currentDateTime) ->orderBy('datetime')->get();
+         
+          ->whereBetween('datetime', [$currentDateTime, $end_time])->get();
             
-           /*  ->get(['datetime','status' ,'channel', 'play_ground', 'club1_id', 'club2_id'])
-            ->map(function ($match) {
-                $datetime = new Date($match->datetime);
-                $match->day = Hijri::date('l', strtotime($datetime));
-                $match->month = date('m/d', strtotime($datetime));
-                $match->time =Hijri::date('h:i a', strtotime($datetime));
-                
-                $match->status = 'معروض مباشر';
-                $match->is_first_half = false;
-                $match->is_second_half = false;
-                
-                $club1 = Club::find($match->club1_id);
-                $club2 = Club::find($match->club2_id);
-                $match->club1_name = $club1->name;
-                $match->club1_image = $club1->logo;
-                $match->club2_name = $club2->name;
-                $match->club2_image = $club2->logo;
-                unset($match->club1_id);
-                unset($match->club2_id);
-                unset($match->datetime);
-                $currentDateTime = Carbon::now();
-                $matchTime = Carbon::parse($match->datetime);
-        $diffInMinutes = $matchTime->diffInMinutes($currentDateTime);
-
-            if ($diffInMinutes <= 45) {
-                $match->is_first_half = true;
-            } elseif ($diffInMinutes <= 105) {
-                $match->is_second_half = true;
-            } 
-                return $match;
-            }); */
+           
             
         
             if (!$Matche) {
@@ -261,6 +228,31 @@ class MatcheController extends Controller
              
             $data['Matche'] =UpcomingMatchResource::collection($Matche);
             return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
+    }
+    public function getDisplayedMatcheWithReplecment(Request $request)
+    { try{
+        
+       
+        $Matche = Matche::where('uuid',$request->uuid)->first();
+            
+        
+            
+       // $dade = Carbon::parse($Matche->datetime);
+            if (!$Matche) {
+                $data['message'] = 'No Matche found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+            
+                
+           
+         
+          $data['Matche'] =  new MatchWithReplecmentResource($Matche);
+            return $this->apiResponse($data, true, null, 200);
+        
         }
         catch (\Exception $ex) {
             return $this->apiResponse(null, false, $ex->getMessage(), 500);

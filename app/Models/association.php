@@ -30,6 +30,10 @@ class association extends Model
     {
         return $this->belongsTo(Sport::class);
     }
+    public function informvideo()
+    {
+        return $this->MorphMany(Video::class, 'videoable');
+    }
 
 
 

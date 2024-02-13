@@ -15,17 +15,26 @@ class UpcomingMatchResource extends JsonResource
      */
     public function toArray($request)
     {
-        $datetime = Carbon::parse($this->datetime);
-        $currentTime = Carbon::now();
-        $status = $this->status === 'finished' ? 'not_started' : 'finished';
+        $datetime = strtotime($this->datetime);
+        $dade = Carbon::parse($this->datetime);
+        $currentTime =date('Y-m-d H:i:s');
+        
 
         $isLive = $this->status === 'life';
         $channel = $isLive ? $this->channel : null;
 
-        $firstHalfEnd = $datetime->copy()->addMinutes(45);
-        $secondHalfStart = $datetime->copy()->addMinutes(45)->addSeconds(1);
-        $isFirstHalf = $datetime->lt($firstHalfEnd);
-        $isSecondHalf = $datetime->between($secondHalfStart, $secondHalfStart->copy()->addMinutes(90));
+         
+        $end_first_half =  date('Y-m-d H:i:s',strtotime('+45 minutes', $datetime));
+        $end_second_half =date('Y-m-d H:i:s',strtotime('+90 minutes', $datetime));
+    
+        
+        if ($currentTime < $end_first_half) {
+            $half = 'First Half';
+        } elseif ($currentTime <= $end_second_half) {
+            $half = 'Second Half';
+        } else {
+            $half = 'Match Finished';
+        }
 
         $club1 = [
             'name' => $this->club1->name,
@@ -52,28 +61,23 @@ class UpcomingMatchResource extends JsonResource
          
         $data = [
             'datetime' => [
-                'day' => $datetime->dayName,
-                'time' => $datetime->format('H:i'),
-                'month' => $datetime->monthName
+                'date' => $dade->translatedFormat('j F Y '),
+                'day' => $dade->translatedFormat('l'),
+                'time' => $dade->translatedFormat('h:i A'),
             ],
-            'status' => $status,
+            
             'is_live' => $isLive,
             'channel' => $channel,
             'play_ground' => $this->play_ground,
             'club1' => $club1,
             'club2' => $club2,
-            'half' => $isFirstHalf ? 'الشوط الأول' : ($isSecondHalf ? 'الشوط الثاني' : null),
+            'half' => $half,
             
         ];
 
-        if ($datetime->gt($currentTime) && $datetime->lt($currentTime->copy()->addHours(3))) {
-            return $data;
-        }
+         
 
-        unset($data['status']);
-        unset($data['is_live']);
-        unset($data['channel']);
-        unset($data['half']);
+        
 
         return $data;
     }

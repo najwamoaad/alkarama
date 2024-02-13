@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
-use Alkoumi\LaravelHijriDate\Hijri;
+
 class MatchWithStateResource extends JsonResource
 {
     /**
@@ -15,38 +15,23 @@ class MatchWithStateResource extends JsonResource
      */
     public function toArray($request)
     {
-        $datetime = $this->datetime;
-        $day =   Hijri::date('l', strtotime($datetime));
-        $date = Date('Y/m/d', strtotime($datetime));
-        $time =  Hijri::date('h:i A', strtotime($datetime));
-        
-        $goals = [];
-        $statistics = $this->statistics;
-    
-        foreach ($statistics as $statistic) {
-            $v = json_decode($statistic->value, true);
-            
-            $values = array_values($v);  
-        
       
-            $value1 = $values[0];  
-            $value2 = $values[1]; 
-        }
+     
+        $dade = Carbon::parse($this->datetime);
+         
+        
     
         return [
-            
-            
-            'date' => $date,
-            'day' => $day,
-            'time' => $time,
-            'round' => $this->round,
-            'playground' => $this->playground,
+            'date' => $dade->translatedFormat('j F Y '),
+            'day' => $dade->translatedFormat('l'),
+            'time' => $dade->translatedFormat('h:i A'),
+       
+            'playground' => $this->play_ground,
             'club1' => $this->club1->name,
             'club1logo' => $this->club1->logo,
             'club2' => $this->club2->name,
             'club2logo' => $this->club2->logo,
-            'goalsclub1' =>$value1,
-            'goalsclub2' =>$value2,
+           
         ];
     }
 }

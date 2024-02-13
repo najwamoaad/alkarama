@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class InformationCollection extends ResourceCollection
+class AssociationCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,6 +14,14 @@ class InformationCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
+            'boss' => $this->boss,
+            'image' => $this->image,
+            'description' => $this->description,
+            'country' => $this->country,
+            'sport_id' => $this->sport_id,
+        ];
     }
 }

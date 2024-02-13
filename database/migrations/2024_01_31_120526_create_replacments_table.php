@@ -21,8 +21,8 @@ return new class extends Migration
             $table->foreign("inplayer_id")->references("id")->on("players")->onDelete('cascade');
             $table->unsignedBigInteger("outplayer_id");
             $table->foreign("outplayer_id")->references("id")->on("players")->onDelete('cascade');
-            $table->unsignedBigInteger("match_id");
-            $table->foreign("match_id")->references("id")->on("matches")->onDelete('cascade');
+            $table->unsignedBigInteger("matche_id");
+            $table->foreign("matche_id")->references("id")->on("matches")->onDelete('cascade');
             
         });
     }

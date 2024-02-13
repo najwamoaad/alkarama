@@ -20,13 +20,20 @@ class Replacment extends Model
         'match_id'=>"integer"
         
 ];
-    public function player(){
+    public function inplayer(){
 
-     return $this->belongsTo(Player::class);
+     return $this->belongsTo(Player::class,'inplayer_id');
 
 
 
     }
+    public function outplayer(){
+
+        return $this->belongsTo(Player::class,'outplayer_id');
+   
+   
+   
+       }
     public function match(){
 
         return $this->belongsTo(Matche::class);

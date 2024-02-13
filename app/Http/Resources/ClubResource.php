@@ -16,10 +16,8 @@ class ClubResource extends JsonResource
     {
         return [
            
-            'name' => $this->name,
-            'address' => $this->high,
-            'logo' => $this->born,
-            'title'=>  $this->title ,
+            'club_name' => $this->name,
+            'club_image' => $this->logo,
          
         ];
     }

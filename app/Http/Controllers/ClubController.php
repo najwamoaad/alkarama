@@ -75,20 +75,78 @@ class ClubController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function showRegular(Request $request)
     {
         $dataa = [];
          try{
-            $Club = Club::where('uuid',$request->uuid)->first();
+            $Club = Club::where('uuid', $request->uuid)->first();
+      //      $Club = Club::where('uuid',$request->uuid)->first();
            
         if (!$Club) {
             $data['message'] = 'No Club found';
             return $this->apiResponse($data, true, null, 200);
         }
-         $mm = $Club->information()->get();
+        else{
+      //   $mm = $Club->information()->get();
       
-        $data['Club'] =ClubResource::collection($mm);
+         $data['Club'] =[
+            'clubname' => $Club->name,
+            'clubadd' => $Club->address,
+            'clublogo' => $Club->logo,
+            'informations' => $Club->informations()->where('type', 'regular')->get(['title', 'content','image']),];
         return $this->apiResponse($data, true, null, 200);
+        }
+    }
+    catch (\Exception $ex) {
+        return $this->apiResponse(null, false, $ex->getMessage(), 500);
+    }
+    }
+    public function showStrategy(Request $request)
+    {
+        $dataa = [];
+         try{
+            $Club = Club::where('uuid', $request->uuid)->first();
+      //      $Club = Club::where('uuid',$request->uuid)->first();
+           
+        if (!$Club) {
+            $data['message'] = 'No Club found';
+            return $this->apiResponse($data, true, null, 200);
+        }
+        else{
+      //   $mm = $Club->information()->get();
+      
+         $data['Club'] =[
+             
+           
+            'clublogo' => $Club->logo,
+            'informations' => $Club->informations()->where('type', 'strategy')->get(['title', 'content']),];
+        return $this->apiResponse($data, true, null, 200);
+        }
+    }
+    catch (\Exception $ex) {
+        return $this->apiResponse(null, false, $ex->getMessage(), 500);
+    }
+    }
+   
+    public function showSlider(Request $request)
+    {
+        
+         try{
+            $Club = Club::where('uuid', $request->uuid)->first();
+      //      $Club = Club::where('uuid',$request->uuid)->first();
+           
+        if (!$Club) {
+            $data['message'] = 'No Club found';
+            return $this->apiResponse($data, true, null, 200);
+        }
+        else{
+      //   $mm = $Club->information()->get();
+      
+         $data['Club'] =[
+          
+            'informations' => $Club->informations()->where('type', 'slider')->get(['image']),];
+        return $this->apiResponse($data, true, null, 200);
+        }
     }
     catch (\Exception $ex) {
         return $this->apiResponse(null, false, $ex->getMessage(), 500);

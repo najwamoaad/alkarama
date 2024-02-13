@@ -13,7 +13,6 @@ class Matche extends Model
         'uuid',
         'datetime',
         'status',
-     
         'channel',
         "round",
         "play_ground",
@@ -73,8 +72,13 @@ class Matche extends Model
    
    
        }
-       public function information(): MorphMany
+       public function informations()
        {
            return $this->morphMany(Information::class, 'infoable');
+       }
+           public function informvideo() : MorphMany
+           {
+               return $this->MorphMany(Video::class, 'videoable');
+           
        }
 }

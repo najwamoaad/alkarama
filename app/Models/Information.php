@@ -14,7 +14,7 @@ class Information extends Model
         'title',
         'content',
         'image',
-        'tupe',
+        'type',
         'reads',
 
     ];

@@ -15,17 +15,17 @@ class InformationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         
         try {
-            $information = Information::where('type',$request->type)->firstOrFail();
-
+            
+            $information = Information::where('type','news')->orderBy('created_at', 'desc') ->limit(10)->get();
             if (!$information) {
                 return $this->notFoundResponse('information not found');
             }
 
-            $data['information']= new InformationResource($information);
+            $data['information']=  InformationResource::collection($information);
             return $this->apiResponse($data,true,null,200);
 
         } catch (\Exception $ex) {

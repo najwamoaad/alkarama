@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class InformationCollection extends ResourceCollection
+class PlansCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -16,4 +16,5 @@ class InformationCollection extends ResourceCollection
     {
         return parent::toArray($request);
     }
+
 }

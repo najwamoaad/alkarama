@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class InformationResource extends JsonResource
+class videoRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,14 +14,11 @@ class InformationResource extends JsonResource
      */
     public function toArray($request)
     {
-      
         return [
             
-            'title' => $this->title,
-            'content' => $this->content,
-            'image' => $this->image,
            
-            'reads' => $this->reads,
+            'description'=> $this->description,
+            'url' => $this->url,
         ];
     }
 }

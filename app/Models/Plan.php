@@ -21,7 +21,7 @@ class Plan extends Model
         return $this->belongsTo(Player::class);
     }
 
-    public function metch()
+    public function matche()
     {
         return $this->belongsTo(Matche::class);
     }

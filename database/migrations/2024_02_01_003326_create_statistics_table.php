@@ -20,7 +20,7 @@ return new class extends Migration
             $table->json('value');
             $table->unsignedBigInteger('matche_id');
             // Add foreign key constraint
-            $table->foreign('match_id')->references('id')->on('matches')->onDelete('cascade');
+            $table->foreign('matche_id')->references('id')->on('matches')->onDelete('cascade');
             $table->timestamps();
         });
     }

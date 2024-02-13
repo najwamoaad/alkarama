@@ -33,8 +33,12 @@ class Club extends Model
         return $this->hasMany(Standing::class);
     }
      
-    public function information() 
+    public function informations() 
     {
         return $this->MorphMany(Information::class, 'infoable');
+    }
+    public function informvideo() 
+    {
+        return $this->MorphMany(Video::class, 'videoable');
     }
 }

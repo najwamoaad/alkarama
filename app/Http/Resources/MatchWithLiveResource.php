@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
-use Alkoumi\LaravelHijriDate\Hijri;
+ 
 class MatchWithLiveResource extends JsonResource
 {
     /**
@@ -17,13 +17,10 @@ class MatchWithLiveResource extends JsonResource
     {
         Carbon::setlocale(config('app.locale'));
         $dade = Carbon::parse($this->datetime);
-        $datetime = $this->datetime;
-        $day =   Hijri::date('l', strtotime($datetime));
-        $date = $dade->toDayDateTimeString() ;
-        $time =  Hijri::date('h:i A', strtotime($datetime));
+       
         
       
-        $statistics = $this->statistics()->first()->value;
+      //  $statistics = $this->statistics()->first()->value;
     
         $goals = [];
         $statistics = $this->statistics;
@@ -37,16 +34,16 @@ class MatchWithLiveResource extends JsonResource
             $value1 = $values[0];  
             $value2 = $values[1]; 
         }
-      
+   
         return [
             
             
-            'date' => $date,
-           'test' => $date->translatedFormat('l j F Y H:i:s'),
-            'day' => $day,
-            'time' => $time,
+             
+           'date' => $dade->translatedFormat('j F '),
+            'day' => $dade->translatedFormat('l'),
+            'time' => $dade->translatedFormat('h:i A'),
           
-            'playground' => $this->playground,
+            'playground' => $this->play_ground,
             'club1' => $this->club1->name,
             'club1logo' => $this->club1->logo,
             'club2' => $this->club2->name,

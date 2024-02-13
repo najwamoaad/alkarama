@@ -16,7 +16,7 @@ class StandingController extends Controller
      */
     public function index()
     {try{
-        $standings = Standing::with('club')->get();
+        $standings = Standing::with('club')->orderBy('points', 'asc')->get();
        
         $data['standings'] = StandingResource::collection($standings);
 

@@ -19,9 +19,9 @@ return new class extends Migration
             $table->unsignedBigInteger('player_id');
             // Add foreign key constraint
             $table->foreign('player_id')->references('id')->on('players')->onDelete('cascade');
-            $table->unsignedBigInteger('match_id');
+            $table->unsignedBigInteger('matche_id');
             // Add foreign key constraint
-            $table->foreign('match_id')->references('id')->on('matches')->onDelete('cascade');
+            $table->foreign('matche_id')->references('id')->on('matches')->onDelete('cascade');
             $table->enum('status', ['main', 'beanch']);
             $table->timestamps();
         });
