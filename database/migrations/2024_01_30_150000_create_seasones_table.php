@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->uuid("uuid")->unique();
             $table->string("name");
-            $table->date("satrt_date");
+            $table->date("start_date");
             $table->date("end_date");
             $table->timestamps();
         });

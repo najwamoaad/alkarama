@@ -9,15 +9,16 @@ class Replacment extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'uuid',
         'inplayer_id',
         'outplayer_id',
-        'match_id'
+        'matche_id'
 
     ];
     protected $casts = [
         'inplayer_id'=>"integer",
         'outplayer_id'=>"integer",
-        'match_id'=>"integer"
+        'matche_id'=>"integer"
         
 ];
     public function inplayer(){
@@ -34,7 +35,7 @@ class Replacment extends Model
    
    
        }
-    public function match(){
+    public function matche(){
 
         return $this->belongsTo(Matche::class);
    

@@ -16,7 +16,7 @@ class Matche extends Model
         'channel',
         "round",
         "play_ground",
-        "session_id",
+        "seasone_id",
         "club1_id",
         "club2_id"
 
@@ -28,7 +28,7 @@ class Matche extends Model
         'channel' => "string",
         
         "play_ground" => "string",
-        "session_id" => "integer",
+        "seasone_id" => "integer",
         "club1_id" => "integer",
         "club2_id" => "integer"
     ];
@@ -76,7 +76,7 @@ class Matche extends Model
        {
            return $this->morphMany(Information::class, 'infoable');
        }
-           public function informvideo() : MorphMany
+           public function informvideo()
            {
                return $this->MorphMany(Video::class, 'videoable');
            

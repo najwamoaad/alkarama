@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BossesRessource extends JsonResource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,14 @@ class BossesRessource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-          
+        return[
+
+            'uuid' => $this->uuid,
             'name' => $this->name,
-            'start_date'=> $this->start_date,
-            'image' => $this->image,
+            'email' => $this->email,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
+
 }

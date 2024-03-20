@@ -10,6 +10,7 @@ use App\Http\Traits\FileUploader1;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
 use  App\Models\Employee;
+use App\Models\Sport;
 
 
 class employeesController extends Controller
@@ -58,7 +59,39 @@ class employeesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'name'=>'required|string',
+                'work'=>'required|string',
+                'jop_type'=>'in:manager,coach',
+                
+                'sportName' => 'required',
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $sportName = $request->input('sportName');
+            $sport = Sport::where('name', $sportName)->first();
+            
+            if(  ( !$sport) ) {
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                $employee=Employee::create([
+                 'uuid'=>Str::uuid(),   
+                'name'=>$request->name,
+                'work'=>$request->work,
+                'jop_type'=>$request->jop_type,
+                'sport_id' =>$sport->id,     
+                ]);
+            
+            $data['employee'] = new employeesRessource($employee);
+            return $this->apiResponse($data, true, null, 200);     }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**
@@ -90,9 +123,47 @@ class employeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'name'=>'required|string',
+                'work'=>'required|string',
+                'jop_type'=>'in:manager,coach',
+               
+                'sportName' => 'required ',
+                
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $sportName = $request->input('sportName');
+            $sport = Sport::where('name', $sportName)->first();
+            $employee = Employee::where('uuid',$request->uuid)->firstOrFail();
+            if(  ( !$sport ) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+            $employee->update([
+                
+                    'name'=>$request->name,
+                    'work'=>$request->work,
+                    'jop_type'=>$request->jop_type,
+                    'sport_id' =>$sport->id,
+                ]);
+            
+            
+             
+                $data['employee'] = new  employeesRessource( $employee);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**

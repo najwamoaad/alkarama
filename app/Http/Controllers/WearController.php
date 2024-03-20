@@ -5,6 +5,8 @@ use App\Http\Traits\GeneralTrait;
 use App\Http\Traits\FileUploader1;
 use Illuminate\Http\Request;
 use App\Models\Wear;
+use App\Models\Sport;
+use App\Models\Seasone;
 use App\Http\Resources\WearResource;
 use App\Http\Resources\WearCollection;
 use Illuminate\Support\Facades\Validator;
@@ -40,33 +42,43 @@ class WearController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {  try {
         $validator = Validator::make($request->all(), [
         
-           'sport_id'=>'required|string|exists:sports,id',
-           'seasone_id'=>'required|string|exists:seasones,id',
+            'sport_name'=>'required|string',
+            'seasone_name'=>'required|string',
         ]);
 
         if ($validator->fails()) {
             return $this->requiredField($validator->errors()->first());
         }
-
-        try {
+        $sportName = $request->input('sport_name');
+        $seasoneName = $request->input('seasone_name');
+       
+        $sport = Sport::where('name', $sportName)->first();
+        $Seasone = Seasone::where('name', $seasoneName)->first();
+        if( (!$sport||!$Seasone) ) {
+           
+            $data['message'] = 'Sport || Seasone not found';
+            return $this->apiResponse($data, true, null, 200);
+        }
+       
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $folder = 'Wear_images';
             $Wear=Wear::create([
                 'uuid'=>Str::uuid(),
                 'image'=> $this->storeImage($file, $folder),
-                'sport_id'=>$request->sport_id,
-                'seasone_id'=>$request->seasone_id,
+                'sport_id'=>$sport->id,
+                'seasone_id'=>$Seasone->id,
             ]);
-        }
         
+            }
          
             $data['Wear'] = new WearResource($Wear);
 
             return $this->apiResponse($data, true, null, 200);
+        
         }
         catch (\Exception $ex) {
             return $this->apiResponse(null, false, $ex->getMessage(), 500);
@@ -102,9 +114,50 @@ class WearController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try { $validator = Validator::make($request->all(), [
+            'sport_name'=>'required|string',
+            'seasone_name'=>'required|string',
+            
+        ]);
+            $Wear = Wear::where('uuid',$request->uuid)->firstOrFail();
+            $sportName = $request->input('sport_name');
+            $seasoneName = $request->input('seasone_name');
+           
+            $sport = Sport::where('name', $sportName)->first();
+            $Seasone = Seasone::where('name', $seasoneName)->first();
+            if(  ( !$sport||!$Seasone) ) {
+               
+                $data['message'] = 'Sport || Seasone not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+        $currentImagePath = $Wear->image;
+       
+        
+
+        if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+        }
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $folder = 'Wear_images';
+            $Wear->update([
+                'sport_id'=>$sport->id,
+                'seasone_id'=>$Seasone->id,
+                'image'=> $this->updateImage($file, $folder, $currentImagePath),
+                 
+            ]);
+        }
+        
+         
+            $data['Wear'] = new WearResource($Wear);
+
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**

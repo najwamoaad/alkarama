@@ -11,8 +11,8 @@ class Posse extends Model
     protected $fillable = [
         'name',
         'start_date',
-        'image'
-
+        'image',
+       'uuid'
     ];
     protected $casts = [
         'name'=>"string",

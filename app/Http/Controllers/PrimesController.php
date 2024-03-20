@@ -8,7 +8,8 @@ use App\Http\Traits\FileUploader1;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
 use App\Models\Prime;
-
+use App\Models\Sport;
+use App\Models\Seasone;
 use Illuminate\Http\Request;
 
 class PrimesController extends Controller
@@ -37,7 +38,24 @@ class PrimesController extends Controller
             return $this->apiResponse(null, false, $ex->getMessage(), 500);
         }
     }
-
+    public function index1()
+    {
+        try {
+           // $prime = Prime::all();
+           $prime  = Prime::where('type',"club")->get();
+          
+            if (!$prime) {
+                $data['message'] = 'No  prime found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+             
+            $data['prime']= PrimesRessource::collection($prime);
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -56,8 +74,56 @@ class PrimesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+                'name'=>'required|string',
+                'description'=>'required|string',
+                'type'=>'in:personal,club',
+               
+                'sportname' => 'required',
+                'seasonename' => 'required'
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $sportName = $request->input('sportname');
+            $seasoneName = $request->input('seasonename');
+            $Seasone = Seasone::where('name', $seasoneName)->first();
+            $sport = Sport::where('name', $sportName)->first();
+            
+            if(  ( !$sport ||!$Seasone) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $folder = 'prime_images';
+                $prime=Prime::create([
+                    
+            
+                 'uuid'=>Str::uuid(),   
+                'name'=>$request->name,
+                'image'=> $this->storeImage($file, $folder),
+                'description'=>$request->description,
+                'type'=>$request->type,
+                
+                //'personal,club',sport
+                'sport_id' =>$sport->id,
+                'seasone_id'=>$Seasone->id,
+              
+                    
+                ]);}
+            
+            $data['prime'] = new PrimesRessource( $prime);
+            return $this->apiResponse($data, true, null, 200);     }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
+    
 
     /**
      * Display the specified resource.
@@ -88,9 +154,56 @@ class PrimesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+               
+                'name'=>'required|string',
+                'description'=>'required|string',
+                'type'=>'in:personal,club',
+               
+                'sportname' => 'required',
+                'seasonename' => 'required'
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $sportName = $request->input('sportname');
+            $seasoneName = $request->input('seasonename');
+            $Seasone = Seasone::where('name', $seasoneName)->first();
+            $sport = Sport::where('name', $sportName)->first();
+            $prime = Prime::where('uuid',$request->uuid)->firstOrFail();
+            if(  ( !$sport ||!$Seasone) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+            $currentImagePath = $prime->image;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $folder = 'prime_images';
+                $prime->update([
+                //'personal,club',
+                    'name'=>$request->name,
+                    'type'=>$request->type,
+                    'description'=>$request->description,
+                    'sport_id' =>$sport->id,
+                    'seasone_id'=>$Seasone->id,
+                    'image'=> $this->updateImage($file, $folder, $currentImagePath),
+                ]);
+            }
+            
+             
+                $data['prime'] = new PrimesRessource($prime);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**

@@ -5,6 +5,7 @@ use App\Http\Traits\GeneralTrait;
 use App\Http\Traits\FileUploader1;
 use Illuminate\Http\Request;
 use App\Models\Player;
+use App\Models\Sport;
 use App\Http\Resources\PlayerResource;
 use App\Http\Resources\PlayerCollection;
 use App\Http\Resources\PlayerWithInfoResource;
@@ -48,9 +49,9 @@ class PlayerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {  try {
         $validator = Validator::make($request->all(), [
-            'name' =>'required|string',
+            'name' =>'required|string|unique:players',
            'high'=>'required|integer',
            'play'=>'required|string',
            'from'=>'required|string',
@@ -58,19 +59,25 @@ class PlayerController extends Controller
            'born'=>'required',
            'first_club'=>'required|string',
            'career'=>'required|string',
-           'sport_id'=>'required|string|exists:sports,id',
+           'sport_name'=>'required|string',
             
         ]);
 
         if ($validator->fails()) {
             return $this->requiredField($validator->errors()->first());
         }
-
-        try {
+        $sportName = $request->input('sport_name');
+        $sport = Sport::where('name', $sportName)->first();
+       
+        if( (!$sport) ) {
+           
+            $data['message'] = 'Sport  not found';
+            return $this->apiResponse($data, true, null, 200);
+        }
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $folder = 'player_images';
-            $Player=Player::create([
+                $Player=Player::create([
                 'uuid'=>Str::uuid(),
                 'name'=>$request->name,
                 'high'=>$request->high,
@@ -81,7 +88,7 @@ class PlayerController extends Controller
                 'first_club'=>$request->first_club,
                 'career'=>$request->career,
                 'image'=> $this->storeImage($file, $folder),
-                'sport_id'=>$request->sport_id
+                'sport_id'=>$sport->id,
             ]);
         }
         
@@ -131,14 +138,12 @@ class PlayerController extends Controller
      */
     public function update(Request $request)
     {
-       
-         
-
         try {
             $Player = Player::where('uuid',$request->uuid)->firstOrFail();
         $currentImagePath = $Player->image;
+        $id = $Player->id;
         $validator = Validator::make($request->all(), [
-            'name' =>'required|string',
+            'name' =>'required|string|unique:players,name,' . $id,
            'high'=>'required|integer',
            'play'=>'required|string',
            'from'=>'required|string',
@@ -146,12 +151,20 @@ class PlayerController extends Controller
            'born'=>'required',
            'first_club'=>'required|string',
            'career'=>'required|string',
-           'sport_id'=>'required|string|exists:sports,id',
+           'sport_name'=>'required|string',
             
         ]);
 
         if ($validator->fails()) {
             return $this->requiredField($validator->errors()->first());
+        }
+         $sportName = $request->input('sport_name');
+        $sport = Sport::where('name', $sportName)->first();
+       
+        if(  ( !$sport) ) {
+           
+            $data['message'] = 'Sport  not found';
+            return $this->apiResponse($data, true, null, 200);
         }
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
@@ -166,7 +179,7 @@ class PlayerController extends Controller
                 'first_club'=>$request->first_club,
                 'career'=>$request->career,
                 'image'=> $this->updateImage($file, $folder, $currentImagePath),
-                'sport_id'=>$request->sport_id
+                'sport_id'=>$sport->id,
             ]);
         }
         

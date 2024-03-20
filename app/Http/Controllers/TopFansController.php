@@ -55,7 +55,39 @@ class TopFansController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+                'name'=>'required|string',
+                'associationName' => 'required'
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $associationName = $request->input('associationName');
+            $association = association::where('boss', $associationName)->first();
+            
+            if(  ( ! $association) ) {
+               
+                $data['message'] = ' association not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                
+                $TopFans =TopFans::create([
+                    
+                    'uuid'=>Str::uuid(),
+                    'association_id'=>$association->id,
+                    'name'=>$request->name,
+                    
+                ]);
+            
+            $data['TopFans'] = new TopFansRessource($TopFans);
+            return $this->apiResponse($data, true, null, 200);  }
+            catch (\Exception $ex) 
+        {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**
@@ -103,9 +135,44 @@ class TopFansController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try { $validator = Validator::make($request->all(), [
+            'name'=>'required|string',
+                'associationName' => 'required'
+            
+        ]);
+        $TopFans = TopFans::where('uuid',$request->uuid)->firstOrFail();
+        $associationName = $request->input('associationName');
+        $association = association::where('boss',$associationName)->first();
+     
+            if(  ( !$association) ) {
+               
+                $data['message'] = 'association not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+        $currentImagePath =  $TopFans->image;
+   
+        
+
+        if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+        }
+             
+                $TopFans->update([
+                 
+                    'association_id'=>$association->id,
+                    'name'=>$request->name,
+            ]);
+       
+        
+        $data['TopFans'] = new TopFansRessource( $TopFans);
+      
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**

@@ -17,11 +17,12 @@ class Statistic extends Model
         'value',
         'matche_id',
     ];
-    
+   
     public function metche()
     {
         $data = $this->belongsTo(Matche::class,"matche_id","id");
        
         return $data;
     }
+
 }

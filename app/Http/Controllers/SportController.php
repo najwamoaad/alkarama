@@ -102,7 +102,7 @@ class SportController extends Controller
         try {
             $Sport = Sport::where('uuid',$request->uuid)->firstOrFail();
         $currentImagePath = $Sport->image;
-        $uuid = $Sport->uuid;
+    
         $validator = Validator::make($request->all(), [
             'name' =>'required|string',
           

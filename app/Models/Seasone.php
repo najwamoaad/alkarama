@@ -19,8 +19,8 @@ class Seasone extends Model
     protected $casts=
     [
         "name"=>"string",
-        "start_date"=>"date_time",
-        "end_date"=>"date_time",
+        "start_date"=>"date",
+        "end_date"=>"date",
     ];
     public function wears()
     {
@@ -43,7 +43,7 @@ class Seasone extends Model
     {
         return $this->hasMany(Matche::class);
     }
-    public function information(): MorphMany
+    public function informations()
     {
         return $this->morphMany(Information::class, 'infoable');
     }

@@ -10,30 +10,64 @@ use App\Http\Traits\GeneralTrait;
 use  App\Http\Resources\videoRessource;
 use  App\Http\Resources\VideoCollection;
 use App\Models\Video;
+use App\Models\Club;
+use App\Models\Matche;
+use App\Models\association;
 class VideoController extends Controller
-{
+{use GeneralTrait;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {try {
-       // $video = Video::where('type',$request->type)->firstOrFail();
-       $Video = Video::all();
-        if (!$video) {
-            return $this->notFoundResponse('video not found');
-        }
-
-        $data['video']= new videoRessource($video);
-        return $this->apiResponse($data,true,null,200);
-
-    } catch (\Exception $ex) {
-        return $this->apiResponse(null, false, $ex->getMessage(), 500);
-    }
+    public function indexvideoclub(Request $request)
+    {
+        try{
+           $Club = Club::where('uuid', $request->uuid)->first();
+     //      $Club = Club::where('uuid',$request->uuid)->first();
+          
+       if (!$Club) {
+           $data['message'] = 'No Club found';
+           return $this->apiResponse($data, true, null, 200);
+       }
+       else{
+     //   $mm = $Club->information()->get();
+     
+        $data['Club'] =[
+         
+           'informations' => $Club->informvideo()->get(['url','description']),];
+       return $this->apiResponse($data, true, null, 200);
+       }
+   }
+   catch (\Exception $ex) {
+       return $this->apiResponse(null, false, $ex->getMessage(), 500);
+   }
     
     }
-
+    public function indexvideoMeche(Request $request)
+    {
+        try{
+           $Matche = Matche::where('uuid', $request->uuid)->first();
+     //      $Club = Club::where('uuid',$request->uuid)->first();
+          
+       if (!$Matche) {
+           $data['message'] = 'No Club found';
+           return $this->apiResponse($data, true, null, 200);
+       }
+       else{
+     //   $mm = $Club->information()->get();
+     
+        $data['Matche'] =[
+         
+           'informations' => $Matche->informvideo()->get(['url','description']),];
+       return $this->apiResponse($data, true, null, 200);
+       }
+   }
+   catch (\Exception $ex) {
+       return $this->apiResponse(null, false, $ex->getMessage(), 500);
+   }
+    
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -98,9 +132,33 @@ class VideoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try{ 
+            $validator = Validator::make($request->all(), [
+                'url' =>'required|string',
+             'description'=>'required|string',
+             ]);
+
+             if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+             }
+             $Video= Video::where('uuid',$request->uuid)->firstOrFail();
+           
+             
+           $Video->update([
+                'description'=>$request->description,
+                'url'=>$request->url,
+               ]) ;
+               
+               
+                $data['Video'] = new videoRessource($Video);
+
+                 return $this->apiResponse($data, true, null, 200);
+        }  
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**
@@ -113,4 +171,101 @@ class VideoController extends Controller
     {
         //
     }
-}
+    public function storeVideoClubs(Request $request)
+    {    try{ 
+            $validator = Validator::make($request->all(), [
+             'url' =>'required|string',
+             'description'=>'required|string',
+             ]);
+
+             if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+             }
+            $Club = Club::where('uuid', $request->uuid)->first();
+             if (!$Club) {
+            $data['message'] = 'No Club found';
+            return $this->apiResponse($data, true, null, 200);
+              }
+            else{
+           
+           $u= $Club->informvideo()->create([
+                'uuid'=>Str::uuid(),
+             
+                'description'=>$request->description,
+                'url'=> $request->url,
+               ]) ;
+              
+               }
+                $data['Video '] = new videoRessource($u);
+
+                 return $this->apiResponse($data, true, null, 200);
+        }  
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
+        }
+        public function storeVideoAssociation(Request $request)
+        {    try{ 
+                $validator = Validator::make($request->all(), [
+                 'url' =>'required|string',
+                 'description'=>'required|string',
+                 ]);
+    
+                 if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+                 }
+                $association = association::where('uuid', $request->uuid)->first();
+                 if (!$association) {
+                $data['message'] = 'No association found';
+                return $this->apiResponse($data, true, null, 200);
+                  }
+                else{
+            
+               $u= $association->informvideo()->create([
+                    'uuid'=>Str::uuid(),
+                    'description'=>$request->description,
+                    'url'=> $request->url,
+                   ]) ;
+                  
+                   }
+                    $data['Video'] = new videoRessource($u);
+    
+                     return $this->apiResponse($data, true, null, 200);
+            }  
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
+            }
+            public function storeVideoMatche(Request $request)
+        {    try{ 
+                $validator = Validator::make($request->all(), [
+                 'url' =>'required|string',
+                 'description'=>'required|string',
+                 ]);
+    
+                 if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+                 }
+                $matche=Matche::where('uuid', $request->uuid)->first();
+                 if (!$matche) {
+                $data['message'] = 'No matche found';
+                return $this->apiResponse($data, true, null, 200);
+                  }
+                else{
+              
+               $u= $matche->informvideo()->create([
+                    'uuid'=>Str::uuid(),
+                    'description'=>$request->description,
+                    'url'=> $request->url,
+                   ]) ;
+          
+                   }
+                    $data['Video'] = new videoRessource($u);
+    
+                     return $this->apiResponse($data, true, null, 200);
+            }  
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
+            }
+    }

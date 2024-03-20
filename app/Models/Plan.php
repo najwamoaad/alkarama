@@ -12,7 +12,7 @@ class Plan extends Model
     protected $fillable = [
         'uuid',
         'player_id',
-        'match_id',
+        'matche_id',
         'status',
     ];
 

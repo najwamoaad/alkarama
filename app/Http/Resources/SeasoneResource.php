@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BossesRessource extends JsonResource
+class SeasoneResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,7 +18,8 @@ class BossesRessource extends JsonResource
           
             'name' => $this->name,
             'start_date'=> $this->start_date,
-            'image' => $this->image,
+            'end_date'=> $this->end_date,
+             
         ];
     }
 }

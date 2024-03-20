@@ -44,6 +44,7 @@ class MatchWithReplecmentResource extends JsonResource
         'club_1' => new ClubResource($this->club1),
             'club_2' => new ClubResource($this->club2),
             'substitutions' => ReplacmentResource::collection($this->Replacments),
+            'plans' => PlansRessource::collection($this->Plans),
         ];
     }
 }

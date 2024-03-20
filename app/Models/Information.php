@@ -11,6 +11,7 @@ class Information extends Model
     protected $table = 'informations';
     use HasFactory;
     protected $fillable = [
+        'uuid',
         'title',
         'content',
         'image',

@@ -54,7 +54,33 @@ class BossesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+                'name'=>'required|string',
+                'start_date'=>'required',
+              
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $folder = 'bosse_images';
+                $bosses=Posse::create([
+                    
+                    'uuid'=>Str::uuid(),
+                    'image'=> $this->storeImage($file, $folder),
+                    'name'=>$request->name,
+                    'start_date'=>$request->start_date,
+                ]);}
+            
+            $data['bosses'] = new  BossesRessource($bosses);
+            return $this->apiResponse($data, true, null, 200);     }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**
@@ -99,9 +125,37 @@ class BossesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request )
     {
-        //
+        try { $validator = Validator::make($request->all(), [
+            'name'=>'required|string',
+                'start_date'=>'required ',
+            
+            
+        ]);
+        $posse = Posse::where('uuid',$request->uuid)->firstOrFail();
+        $currentImagePath =  $posse->image;
+
+        if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+        }
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $folder = 'posse_images';
+                $posse->update([
+                    'image'=> $this->updateImage($file, $folder, $currentImagePath),
+                    'name'=>$request->name,
+                    'start_date'=>$request->start_date,
+            ]);
+        }
+        
+        $data['posse'] = new  BossesRessource( $posse );
+      
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**

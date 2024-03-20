@@ -11,7 +11,7 @@ use App\Http\Resources\StatisticResource;
 use App\Http\Resources\StatisticCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
- 
+use App\Models\Matche;
 class StatisticController extends Controller
 {use GeneralTrait;
     /**
@@ -19,10 +19,10 @@ class StatisticController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        try{
-            $Statistic = Statistic::get();
+        try{$s=Matche::where('uuid',$request->uuid)->value('id');
+            $Statistic = Statistic::where('matche_id', $s)->get();
            
             $data['Statistic'] = StatisticResource::collection($Statistic);
     
@@ -33,15 +33,7 @@ class StatisticController extends Controller
             }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+  
 
     /**
      * Store a newly created resource in storage.
@@ -51,7 +43,48 @@ class StatisticController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+               'name'=>'required|string',
+               'value'=>'required',
+               'matche_datetime'=>'required',
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+    
+            
+              
+                $matcheDatetime= $request->input('matche_datetime');
+               
+            
+                $matche = Matche::where('datetime', $matcheDatetime)->first();
+                if(!$matche){
+                       
+                    $data['message'] = '  matche not found';
+                    return $this->apiResponse($data, true, null, 200);
+                }
+                $Statistic=Statistic::create([
+                    'uuid'=>Str::uuid(),
+                
+                    'matche_id'=>$matche->id,
+                    'name'=>$request->name,
+                    'value'=>$request->value,
+                  
+                ]);
+            
+            
+             
+                $data['Statistic'] = new StatisticResource($Statistic);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**
@@ -65,16 +98,7 @@ class StatisticController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+    
 
     /**
      * Update the specified resource in storage.
@@ -83,9 +107,50 @@ class StatisticController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+               'name'=>'required|string',
+               'value'=>'required',
+               'matche_datetime'=>'required',
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+    
+            $Statistic = Statistic::where('uuid',$request->uuid)->firstOrFail();
+              
+                $matcheDatetime= $request->input('matche_datetime');
+               
+            
+                $matche = Matche::where('datetime', $matcheDatetime)->first();
+                if(!$matche){
+                       
+                    $data['message'] = '  matche not found';
+                    return $this->apiResponse($data, true, null, 200);
+                }
+                $Statistic->update([
+                   
+                
+                    'matche_id'=>$matche->id,
+                    'name'=>$request->name,
+                    'value'=>$request->value,
+                  
+                ]);
+            
+            
+             
+                $data['Statistic'] = new StatisticResource($Statistic);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**

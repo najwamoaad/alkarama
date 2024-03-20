@@ -10,6 +10,7 @@ use App\Http\Resources\AssociationCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
 use App\Models\association;
+use App\Models\Sport;
 
 class AssociationController extends Controller
 {use GeneralTrait;
@@ -55,7 +56,45 @@ class AssociationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                
+                'boss'=>'required|string',
+                
+                'description'=>'required|string',
+                'country'=>'required|string',
+                'sportName' => 'required'
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $sportName = $request->input('sportName');
+            $sport = Sport::where('name', $sportName)->first();
+            
+            if(  ( !$sport) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $folder = 'association_images';
+                $association=association::create([
+                    
+                    'uuid'=>Str::uuid(),
+                    'image'=> $this->storeImage($file, $folder),
+                    'sport_id'=>$sport->id,
+                    'boss'=>$request->boss,
+                    'description'=>$request->description,
+                    'country'=>$request->country,
+                ]);}
+            
+            $data['association'] = new AssociationRessource( $association);
+            return $this->apiResponse($data, true, null, 200);     }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**
@@ -81,7 +120,9 @@ class AssociationController extends Controller
         'boss' => $association->boss,
         'image' => $association->image,
         'description' => $association->description,
-        'videoAssociation' => $association->informvideo()->get(['url', 'description']),];
+        'videoAssociation' => $association->informvideo()->get(['url', 'description']),
+        'topfans' => $association->topFans()->get(['name']),
+    ];
         //      $data['association'] =new AssociationRessource($association);
         return $this->apiResponse($data, true, null, 200);
     }
@@ -110,9 +151,51 @@ class AssociationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try { $validator = Validator::make($request->all(), [
+            'boss'=>'required|string',
+           
+            'description'=>'required|string',
+            'country'=>'required|string',
+            'sportName' => 'required'
+            
+        ]);
+        $association = association::where('uuid',$request->uuid)->firstOrFail();
+        $sportName = $request->input('sportName');
+        $sport = Sport::where('name', $sportName)->first();
+     
+            if(  ( !$sport) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+        $currentImagePath =  $association->image;
+   
+        
+
+        if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+        }
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $folder = 'association_images';
+                $association->update([
+                    'image'=> $this->updateImage($file, $folder, $currentImagePath),
+                    'sport_id'=>$sport->id,
+                    'boss'=>$request->boss,
+                    'description'=>$request->description,
+                    'country'=>$request->country,
+            ]);
+        }
+        
+        $data['association'] = new AssociationRessource( $association);
+      
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**

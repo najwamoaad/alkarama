@@ -5,6 +5,7 @@ use App\Http\Traits\GeneralTrait;
 use App\Http\Traits\FileUploader1;
 use Illuminate\Http\Request;
 use App\Models\Club;
+use App\Models\Sport;
 use App\Http\Resources\ClubResource;
 use App\Http\Resources\ClubCollection;
 use Illuminate\Support\Facades\Validator;
@@ -33,19 +34,25 @@ class ClubController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    { try {
         $validator = Validator::make($request->all(), [
             'name' =>'required|string',
            'address'=>'required|string',
-           'sport_id'=>'required|string|exists:sports,id',
+           'sport_name'=>'required|string',
             
         ]);
 
         if ($validator->fails()) {
             return $this->requiredField($validator->errors()->first());
         }
-
-        try {
+        $sportName = $request->input('sport_name');
+       
+        $sport = Sport::where('name', $sportName)->first();
+        if(  ( !$sport) ) {
+           
+            $data['message'] = 'Sport  not found';
+            return $this->apiResponse($data, true, null, 200);
+        }
             if ($request->hasFile('logo')) {
                 $file = $request->file('logo');
                 $folder = 'clubs_images';
@@ -55,7 +62,7 @@ class ClubController extends Controller
                 'address'=>$request->address,
               
                 'logo'=> $this->storeImage($file, $folder),
-                'sport_id'=>$request->sport_id
+                'sport_id'=>$sport->id,
             ]) ;
         
             }
@@ -153,16 +160,7 @@ class ClubController extends Controller
     }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+    
 
     /**
      * Update the specified resource in storage.
@@ -171,9 +169,53 @@ class ClubController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try { $validator = Validator::make($request->all(), [
+            'name' =>'required|string',
+            'address'=>'required|string',
+            'sport_name'=>'required|string',
+            
+        ]);
+            $Club = Club::where('uuid',$request->uuid)->firstOrFail();
+            $sportName = $request->input('sport_name');
+          
+           
+            $sport = Sport::where('name', $sportName)->first();
+     
+            if(  ( !$sport) ) {
+               
+                $data['message'] = 'Sport not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+        $currentImagePath = $Club->logo;
+   
+        
+
+        if ($validator->fails()) {
+            return $this->requiredField($validator->errors()->first());
+        }
+            if ($request->hasFile('logo')) {
+                $file = $request->file('logo');
+                $folder = 'clubs_images';
+            $Club->update([
+               
+                'name'=>$request->name,
+                'address'=>$request->address,
+              
+                'logo'=> $this->updateImage($file, $folder, $currentImagePath),
+                'sport_id'=>$sport->id,
+            ]);
+        }
+        
+         
+        $data['Club'] = new ClubResource($Club);
+
+            return $this->apiResponse($data, true, null, 200);
+        }
+        catch (\Exception $ex) {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        }
     }
 
     /**

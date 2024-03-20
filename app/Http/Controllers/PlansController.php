@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\str;
 use  App\Models\Plan;
 use  App\Models\Matche;
+use App\Models\Player;
 
 use Illuminate\Http\Request;
 
@@ -56,8 +57,44 @@ class PlansController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+            
+                'status'=>'in:main,beanch',
+                'player_name' => 'required ',
+                'matche_datetime'=>'required',
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $playerName = $request->input('player_name');
+            $matcheDatetime= $request->input('matche_datetime');
+            $player = Player ::where('name', $playerName)->first();
+            $matche = Matche::where('datetime', $matcheDatetime)->first();
+            
+            if(  ( ! $player ||!$matche) ) {
+               
+                $data['message'] = 'player and matche  not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                
+                $plan=Plan::create([
+                 'uuid'=>Str::uuid(),   
+                'status'=>$request->status,
+                'player_id' =>$player->id,
+                'matche_id'=>$matche->id,
+                ]);
+            
+            $data['plan'] = new PlansRessource($plan);
+            return $this->apiResponse($data, true, null, 200);    } 
+        catch (\Exception $ex) 
+        {
+            return $this->apiResponse(null, false, $ex->getMessage(), 500);
+        } 
+        
     }
+    
 
     /**
      * Display the specified resource.
@@ -104,9 +141,44 @@ class PlansController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request )
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+              
+                'status'=>'in:main,beanch',
+                'player_name' => 'required ',
+                'match_datetime' => 'required '
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+            $playerName = $request->input('player_name');
+            $match_datetime = $request->input('match_datetime');
+            $player = Player ::where('name', $playerName)->first();
+            $matche = Matche::where('datetime', $match_datetime)->first();
+            $plan = Plan::where('uuid',$request->uuid)->firstOrFail();
+            if(  ( ! $player ||!$matche) ) {
+               
+                $data['message'] = 'player and matche  not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
+                $plan->update([
+                    'status'=>$request->status,
+                    'player_id' =>$player->id,
+                    'matche_id'=>$matche->id,
+                ]);
+            
+            
+             
+                $data['plan'] = new PlansRessource($plan);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**

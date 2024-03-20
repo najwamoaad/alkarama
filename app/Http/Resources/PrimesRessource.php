@@ -20,9 +20,9 @@ class PrimesRessource extends JsonResource
             'name' => $this->name,
             'image' => $this->image,
             'description' => $this->description,
-            'type' => $this->type,
-            'sport_id' => $this->sport->name,
-          'seasone_id' => $this->seasone->name,
+        //    'type' => $this->type,
+        //    'sport_id' => $this->sport->name,
+       //   'seasone_id' => $this->seasone->name,
         ];
     
     }

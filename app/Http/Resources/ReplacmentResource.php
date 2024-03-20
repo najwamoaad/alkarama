@@ -17,6 +17,7 @@ class ReplacmentResource extends JsonResource
         return [
             'main_player' => new PlayerWithInfoResource($this->inplayer),
             'substitute_player' => new PlayerWithInfoResource($this->outplayer),
+            'Matche' => new MetcheViewResourceResource($this->matche),
         ];
     }
 }

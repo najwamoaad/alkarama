@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Traits\GeneralTrait;
 use App\Models\Matche;
 use App\Models\Club;
+use App\Models\Seasone;
 use App\Http\Resources\MetcheResource;
 use App\Http\Resources\MatchWithStateResource;
 use App\Http\Resources\MatchWithStateCollection;
@@ -15,7 +16,7 @@ use App\Http\Resources\MatchWithLiveCollection;
 use App\Http\Resources\UpcomingMatchResource;
 use App\Http\Resources\UpcomingMatchCollection;
 use App\Http\Resources\PlayerWithInfoResource;
- 
+use App\Http\Resources\MetcheViewResourceResource;
 use App\Http\Resources\MatchWithReplecmentResource;
  
 use Carbon\Carbon;
@@ -47,24 +48,36 @@ class MatcheController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {    try {
         $validator = Validator::make($request->all(), [
             'datetime' =>'required',
-           'status'=>'required|string',
+           'status'=>'in:not_started,finished,life',
            'channel'=>'required|string',
            'round'=>'required',
            'play_ground'=>'required|string',
-           'session_id'=>'required|string|exists:seasones,id',
-           'club1_id'=>'required|string|exists:clubs,id',
-           'club2_id'=>'required|string|exists:clubs,id',
+           'club1_name'=>'required|string',
+           'club2_name'=>'required|string',
+           'seasone_name'=>'required|string',
+            
         ]);
 
         if ($validator->fails()) {
             return $this->requiredField($validator->errors()->first());
         }
 
-        try {
-            
+        
+            $clubName1 = $request->input('club1_name');
+            $clubName2 = $request->input('club2_name');
+            $seasoneName = $request->input('seasone_name');
+           
+            $club1 = Club::where('name', $clubName1)->first();
+            $club2 = Club::where('name', $clubName2)->first();
+            $Seasone = Seasone::where('name', $seasoneName)->first();
+            if((!$club1||!$Seasone||!$club2)){
+                   
+                $data['message'] = 'club || Seasone not found';
+                return $this->apiResponse($data, true, null, 200);
+            }
             $Matche=Matche::create([
                 'uuid'=>Str::uuid(),
                 'datetime'=>$request->datetime,
@@ -72,16 +85,16 @@ class MatcheController extends Controller
                 'channel'=>$request->channel,
                 'round'=>$request->round,
                 'play_ground'=>$request->play_ground,
-                'session_id'=>$request->session_id,
-                'club1_id'=>$request->club1_id,
-                'club2_id'=>$request->club2_id,
-                 
+                
+                'seasone_id'=>$Seasone->id,
+                'club1_id'=>$club1->id,
+                'club2_id'=>$club2->id
               
             ]);
         
         
          
-            $data['Matche'] = new MetcheResource($Matche);
+            $data['Matche'] = new MetcheViewResourceResource($Matche);
 
             return $this->apiResponse($data, true, null, 200);
         }
@@ -111,9 +124,62 @@ class MatcheController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'datetime' =>'required',
+               'status'=>'in:not_started,finished,life',
+               'channel'=>'required|string',
+               'round'=>'required',
+               'play_ground'=>'required|string',
+               'club1_name'=>'required|string',
+               'club2_name'=>'required|string',
+               'seasone_name'=>'required|string',
+                
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->requiredField($validator->errors()->first());
+            }
+    
+            
+                $clubName1 = $request->input('club1_name');
+                $clubName2 = $request->input('club2_name');
+                $seasoneName = $request->input('seasone_name');
+               
+                $club1 = Club::where('name', $clubName1)->first();
+                $club2 = Club::where('name', $clubName2)->first();
+                $Seasone = Seasone::where('name', $seasoneName)->first();
+                $Matche = Matche::where('uuid',$request->uuid)->firstOrFail();
+                if((!$club1||!$Seasone||!$club2)){
+                       
+                    $data['message'] = 'club || Seasone not found';
+                    return $this->apiResponse($data, true, null, 200);
+                }
+                $Matche->update([
+                  
+                    'datetime'=>$request->datetime,
+                    'status'=>$request->status,
+                    'channel'=>$request->channel,
+                    'round'=>$request->round,
+                    'play_ground'=>$request->play_ground,
+                    
+                    'seasone_id'=>$Seasone->id,
+                    'club1_id'=>$club1->id,
+                    'club2_id'=>$club2->id
+                  
+                ]);
+            
+            
+             
+                $data['Matche'] = new MetcheViewResourceResource($Matche);
+    
+                return $this->apiResponse($data, true, null, 200);
+            }
+            catch (\Exception $ex) {
+                return $this->apiResponse(null, false, $ex->getMessage(), 500);
+            }
     }
 
     /**
@@ -179,18 +245,17 @@ class MatcheController extends Controller
     { try{
         
        
-        $currentDateTime = date("Y-m-d H:i:s");
-        
-        
-  
-        $Matche = Matche::whereHas('club1', function ($query)  {
-            $query->where('name',"الكرامة") ;})->where('status', 'life')
-        ->    where('datetime', '>=', $currentDateTime)
-            ->where('datetime', '<=', date('Y-m-d H:i:s', strtotime($currentDateTime. ' + 3 hours')))->get();
-     
+        $currentDateTime = date('Y-m-d H:i:s');
+        $end_time = date('Y-m-d H:i:s', strtotime('+3 hours', strtotime($currentDateTime)));
+      
+            $Matche = Matche::whereHas('club1', function ($query)  {
+                $query->where('name',"الكرامة") ;})->where('status', 'life')
+             
+               -> where('datetime','<=',$currentDateTime) 
+              ->orderBy('datetime', 'asc')->get();
           
             
-        
+   
             if (!$Matche) {
                 $data['message'] = 'No Matche found';
                 return $this->apiResponse($data, true, null, 200);
@@ -207,18 +272,18 @@ class MatcheController extends Controller
     public function getDisplayedMatchesLogoHalf()
     { try{
         
-       
-      
+        $Mm = Matche::all();
+        $m=$Mm->datetime;
         
         $currentDateTime = date('Y-m-d H:i:s');
     $end_time = date('Y-m-d H:i:s', strtotime('+3 hours', strtotime($currentDateTime)));
   
         $Matche = Matche::whereHas('club1', function ($query)  {
             $query->where('name',"الكرامة") ;})->where('status', 'life')
-         
-          ->whereBetween('datetime', [$currentDateTime, $end_time])->get();
+            -> where('datetime','<=',$currentDateTime)->get();
+       //   ->whereBetween('datetime', [$m, $end_time])->get();
             
-           
+          
             
         
             if (!$Matche) {

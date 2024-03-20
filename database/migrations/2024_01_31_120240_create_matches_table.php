@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('channel');
             $table->tinyInteger('round');
             $table->string('play_ground');
-            $table->unsignedBigInteger("session_id");
-            $table->foreign("session_id")->references("id")->on("seasones")->onDelete('cascade');
+            $table->unsignedBigInteger("seasone_id");
+            $table->foreign("seasone_id")->references("id")->on("seasones")->onDelete('cascade');
             $table->unsignedBigInteger("club1_id");
             $table->foreign("club1_id")->references("id")->on("clubs")->onDelete('cascade');
             $table->unsignedBigInteger("club2_id");
